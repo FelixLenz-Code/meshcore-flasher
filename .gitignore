@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.venv/
+.pio-venv/
+library/
+wheels/
+dist/

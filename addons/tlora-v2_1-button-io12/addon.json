@@ -1,0 +1,17 @@
+{
+  "title": "Button IO12",
+  "description": "User-Button auf IO12 statt BOOT (IO0), mit internem Pull-up",
+  "device": "lilygo-lora32-v2-1-1-6",
+  "builds": [
+    {
+      "role": "companionBle",
+      "env": "LilyGo_TLora_V2_1_1_6_companion_radio_ble",
+      "release": "companion"
+    },
+    {
+      "role": "companionUsb",
+      "env": "LilyGo_TLora_V2_1_1_6_companion_radio_usb",
+      "release": "companion"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=MeshCore Flasher
+Comment=MeshCore-Firmware offline auf ESP32-, nRF52-, RP2040- und STM32-Geräte flashen
+Exec=@DIR@/meshcore-flasher
+Icon=drive-removable-media
+Terminal=false
+Categories=Development;Electronics;

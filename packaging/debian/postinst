@@ -1,0 +1,18 @@
+#!/bin/sh
+# Legt das Python-venv mit esptool und adafruit-nrfutil an, ausschließlich aus den
+# mitgelieferten Wheels (kein Internet nötig). PyQt6 kommt vom System.
+set -e
+APP=/opt/meshcore-flasher
+if [ "$1" = configure ]; then
+    rm -rf "$APP/.venv"
+    python3 -m venv --system-site-packages "$APP/.venv"
+    "$APP/.venv/bin/pip" install -q --no-index --find-links "$APP/wheels" \
+        --disable-pip-version-check esptool adafruit-nrfutil
+    if command -v udevadm >/dev/null 2>&1; then
+        udevadm control --reload-rules || true
+        udevadm trigger --subsystem-match=tty --action=add || true
+    fi
+    echo "MeshCore Flasher installiert. Für den Zugriff auf serielle Ports:"
+    echo "  sudo usermod -aG dialout \$USER   (danach neu anmelden)"
+fi
+exit 0

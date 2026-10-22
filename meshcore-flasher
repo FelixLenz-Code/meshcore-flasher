@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Startet den MeshCore Flasher aus dem lokalen venv (ohne Argumente: Oberfläche).
+DIR="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
+cd "$DIR" && exec "$DIR/.venv/bin/python" -m mcflash "$@"

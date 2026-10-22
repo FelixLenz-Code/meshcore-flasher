@@ -1,0 +1,18 @@
+Package: meshcore-flasher
+Version: @VERSION@
+Architecture: @ARCH@
+Maintainer: Felix Lenz <78477361+FelixLenz-Code@users.noreply.github.com>
+Installed-Size: @SIZE@
+Depends: python3 (>= 3.11), python3-venv, python3-pyqt6, udisks2
+Recommends: git
+Suggests: stlink-tools, stm32flash
+Section: electronics
+Priority: optional
+Homepage: https://github.com/FelixLenz-Code/meshcore-flasher
+Description: MeshCore-Firmware offline flashen (ESP32, nRF52, RP2040, STM32)
+ Grafisches Werkzeug und Kommandozeile zum Flashen von MeshCore-Firmware auf
+ LoRa-Geräte. Die Firmware wird auf Knopfdruck aus dem Internet geholt und
+ lokal gespeichert, das Flashen funktioniert danach ohne Internet.
+ .
+ Status: Erprobung. Ein fehlgeschlagenes Update kann ein Gerät unbrauchbar
+ machen, die Nutzung erfolgt auf eigene Verantwortung.

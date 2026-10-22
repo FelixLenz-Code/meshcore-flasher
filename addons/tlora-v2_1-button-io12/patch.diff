@@ -1,0 +1,55 @@
+diff --git a/variants/lilygo_tlora_v2_1/platformio.ini b/variants/lilygo_tlora_v2_1/platformio.ini
+index dc60b6f7..9641df46 100644
+--- a/variants/lilygo_tlora_v2_1/platformio.ini
++++ b/variants/lilygo_tlora_v2_1/platformio.ini
+@@ -72,12 +72,16 @@ lib_deps =
+ 
+ [env:LilyGo_TLora_V2_1_1_6_companion_radio_usb]
+ extends = LilyGo_TLora_V2_1_1_6
++build_unflags = ${LilyGo_TLora_V2_1_1_6.build_unflags}
++  -D PIN_USER_BTN=0
+ build_flags =
+   ${LilyGo_TLora_V2_1_1_6.build_flags}
+   -I examples/companion_radio/ui-new
+   -D MAX_CONTACTS=160
+   -D MAX_GROUP_CHANNELS=8
+   -D ENABLE_USB_INTERFACE
++  -D PIN_USER_BTN=12      ; user button on IO12 instead of BOOT (IO0)
++  -D USER_BTN_PULLUP=true ; IO12 has no external pull-up (strapping pin!)
+ ; NOTE: DO NOT ENABLE -->  -D MESH_PACKET_LOGGING=1
+ ; NOTE: DO NOT ENABLE -->  -D MESH_DEBUG=1
+ build_src_filter = ${LilyGo_TLora_V2_1_1_6.build_src_filter}
+@@ -90,6 +94,8 @@ lib_deps =
+ 
+ [env:LilyGo_TLora_V2_1_1_6_companion_radio_ble]
+ extends = LilyGo_TLora_V2_1_1_6
++build_unflags = ${LilyGo_TLora_V2_1_1_6.build_unflags}
++  -D PIN_USER_BTN=0
+ build_flags =
+   ${LilyGo_TLora_V2_1_1_6.build_flags}
+   -I examples/companion_radio/ui-new
+@@ -97,6 +103,8 @@ build_flags =
+   -D MAX_GROUP_CHANNELS=8
+   -D BLE_PIN_CODE=123456
+   -D OFFLINE_QUEUE_SIZE=128
++  -D PIN_USER_BTN=12      ; user button on IO12 instead of BOOT (IO0)
++  -D USER_BTN_PULLUP=true ; IO12 has no external pull-up (strapping pin!)
+ ;  -D BLE_DEBUG_LOGGING=1
+ ;  -D MESH_PACKET_LOGGING=1
+ ;  -D MESH_DEBUG=1
+diff --git a/variants/lilygo_tlora_v2_1/target.cpp b/variants/lilygo_tlora_v2_1/target.cpp
+index 8c120161..314bf8a4 100644
+--- a/variants/lilygo_tlora_v2_1/target.cpp
++++ b/variants/lilygo_tlora_v2_1/target.cpp
+@@ -14,7 +14,10 @@ EnvironmentSensorManager sensors;
+ 
+ #ifdef DISPLAY_CLASS
+   DISPLAY_CLASS display;
+-  MomentaryButton user_btn(PIN_USER_BTN, 1000, true);
++  #ifndef USER_BTN_PULLUP
++    #define USER_BTN_PULLUP false
++  #endif
++  MomentaryButton user_btn(PIN_USER_BTN, 1000, true, USER_BTN_PULLUP);
+ #endif
+ 
+ bool radio_init() {

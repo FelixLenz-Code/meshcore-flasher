@@ -1,0 +1,7 @@
+#!/bin/sh
+set -e
+if [ "$1" = remove ] || [ "$1" = upgrade ]; then
+    rm -rf /opt/meshcore-flasher/.venv
+    find /opt/meshcore-flasher -name __pycache__ -prune -exec rm -rf {} + 2>/dev/null || true
+fi
+exit 0

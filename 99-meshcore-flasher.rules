@@ -1,0 +1,9 @@
+# MeshCore Flasher: ModemManager soll LoRa-Boards und ihre Bootloader nicht
+# als Modem abfragen (stört sonst Serial-DFU und den 1200-Baud-Reset).
+ATTRS{idVendor}=="239a", ENV{ID_MM_DEVICE_IGNORE}="1"
+ATTRS{idVendor}=="2886", ENV{ID_MM_DEVICE_IGNORE}="1"
+ATTRS{idVendor}=="1915", ENV{ID_MM_DEVICE_IGNORE}="1"
+ATTRS{idVendor}=="2e8a", ENV{ID_MM_DEVICE_IGNORE}="1"
+ATTRS{idVendor}=="303a", ENV{ID_MM_DEVICE_IGNORE}="1"
+ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ENV{ID_MM_DEVICE_IGNORE}="1"
+ATTRS{idVendor}=="1a86", ENV{ID_MM_DEVICE_IGNORE}="1"

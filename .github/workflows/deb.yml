@@ -1,0 +1,75 @@
+name: deb
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-24.04
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Version
+        id: v
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          else
+            base=$(sed -n 's/^__version__ = "\(.*\)"/\1/p' mcflash/__init__.py)
+            echo "version=${base}+git$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Tag passt zur Version im Code
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: grep -q "__version__ = \"${{ steps.v.outputs.version }}\"" mcflash/__init__.py
+
+      - name: Paket bauen
+        run: packaging/build-deb.sh "${{ steps.v.outputs.version }}" ${{ matrix.arch }} dist
+
+      - name: Paket installieren und testen
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q ./dist/*.deb
+          meshcore-flasher --version
+          meshcore-flasher doctor
+          /opt/meshcore-flasher/.venv/bin/python -c "import esptool, nordicsemi.dfu.dfu"
+          QT_QPA_PLATFORM=offscreen timeout 10 /opt/meshcore-flasher/.venv/bin/python -c \
+            "import sys; sys.path.insert(0, '/opt/meshcore-flasher'); from PyQt6.QtWidgets import QApplication; from mcflash import gui; app = QApplication([]); w = gui.Main(); print(w.windowTitle())"
+          sudo apt-get remove -y -q meshcore-flasher
+          test ! -e /opt/meshcore-flasher/.venv
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: meshcore-flasher-${{ matrix.arch }}
+          path: dist/*.deb
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: GitHub-Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/*.deb --repo "$GITHUB_REPOSITORY" \
+            --title "MeshCore Flasher $GITHUB_REF_NAME" --prerelease \
+            --notes "Erprobungsversion. Installation: \`sudo apt install ./meshcore-flasher_*_amd64.deb\` (bzw. arm64 für Raspberry Pi). Bitte den Haftungshinweis in der README lesen: Ein Firmware-Update kann ein Gerät unbrauchbar machen, die Nutzung erfolgt auf eigene Verantwortung."
